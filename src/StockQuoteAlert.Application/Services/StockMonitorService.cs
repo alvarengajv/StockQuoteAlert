@@ -4,6 +4,7 @@ using System.Text;
 using StockQuoteAlert.Domain.Interfaces;
 using StockQuoteAlert.Application.DTOs;
 using StockQuoteAlert.Application.Interfaces;
+using StockQuoteAlert.Application.Validations;
 
 namespace StockQuoteAlert.Application.Services
 {
@@ -20,6 +21,8 @@ namespace StockQuoteAlert.Application.Services
 
         public async Task RunAsync(StockAlertDto alert, CancellationToken cancellationToken)
         {
+            StockAlertDtoValidator.Validate(alert);
+
             while (!cancellationToken.IsCancellationRequested)
             {
                 var currentPrice = await _yahooQuoteService.GetStockPriceAsync(alert.Symbol);
