@@ -4,7 +4,7 @@ using System.Text;
 
 namespace StockQuoteAlert.Domain.Entities
 {
-    internal class StockAlert
+    public class StockAlert
     {
         public string Symbol { get; set; }
         public decimal SellPrice { get; set; }
