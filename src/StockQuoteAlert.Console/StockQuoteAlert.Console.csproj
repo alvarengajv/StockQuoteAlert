@@ -1,6 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="10.0.8" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.8" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.8" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\StockQuoteAlert.Domain\StockQuoteAlert.Domain.csproj" />
     <ProjectReference Include="..\StockQuoteAlert.Application\StockQuoteAlert.Application.csproj" />
     <ProjectReference Include="..\StockQuoteAlert.Infrastructure\StockQuoteAlert.Infrastructure.csproj" />
@@ -20,6 +26,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <AssemblyName>stock-quote-alert</AssemblyName>  
   </PropertyGroup>
 
 </Project>

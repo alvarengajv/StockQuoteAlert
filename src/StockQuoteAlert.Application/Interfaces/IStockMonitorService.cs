@@ -7,6 +7,6 @@ namespace StockQuoteAlert.Application.Interfaces
 {
     public interface IStockMonitorService
     {
-        Task RunAsync(StockAlertDto alert, CancellationToken cancellationToken);
+        Task RunAsync(StockAlertDto alert, TimeSpan interval, CancellationToken cancellationToken);
     }
 }
