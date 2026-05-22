@@ -24,7 +24,7 @@ namespace StockQuoteAlert.Console.Extensions
                 new MailKitService(smtpServer, smtpPort, smtpUser, smtpPassword, fromEmail, toEmail));
 
 
-            services.AddScoped<IYahooQuoteService, YahooQuoteService>();
+            services.AddScoped<IBrapiQuoteService, BrapiQuoteService>();
 
             return services;
         }

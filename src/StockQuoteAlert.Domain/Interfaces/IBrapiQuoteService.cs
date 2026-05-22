@@ -4,7 +4,7 @@ using System.Text;
 
 namespace StockQuoteAlert.Domain.Interfaces
 {
-    public interface IYahooQuoteService
+    public interface IBrapiQuoteService
     {
         Task<decimal> GetStockPriceAsync(string symbol);
     }

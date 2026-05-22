@@ -10,38 +10,55 @@ namespace StockQuoteAlert.Application.Services
 {
     public class StockMonitorService : IStockMonitorService
     {
-        private readonly IYahooQuoteService _yahooQuoteService;
+        private readonly IBrapiQuoteService _BrapiQuoteService;
         private readonly IMailKitService _mailKitService;
 
-        public StockMonitorService(IYahooQuoteService yahooQuoteService, IMailKitService mailKitService)
+        public StockMonitorService(IBrapiQuoteService BrapiQuoteService, IMailKitService mailKitService)
         {
-            _yahooQuoteService = yahooQuoteService;
+            _BrapiQuoteService = BrapiQuoteService;
             _mailKitService = mailKitService;
         }
 
-        public async Task RunAsync(StockAlertDto alert, CancellationToken cancellationToken)
+        public async Task RunAsync(StockAlertDto alert, TimeSpan interval, CancellationToken cancellationToken)
         {
             StockAlertDtoValidator.Validate(alert);
 
+            Console.WriteLine($"Iniciando monitoramento de {alert.Symbol}...");
+            Console.WriteLine($"Venda acima de {alert.SellPrice:F2} | Compra abaixo de {alert.BuyPrice:F2}");
+            Console.WriteLine("Pressione Ctrl+C para encerrar.");
+            Console.WriteLine();
+
             while (!cancellationToken.IsCancellationRequested)
             {
-                var currentPrice = await _yahooQuoteService.GetStockPriceAsync(alert.Symbol);
-
-                if (currentPrice >= alert.SellPrice)
+                try
                 {
-                    await _mailKitService.SendEmailAsync(
-                        $"Alerta de Venda : {alert.Symbol}",
-                        $"O ativo {alert.Symbol} atingiu o preço de venda de {alert.SellPrice:C}. Preço atual: {currentPrice:C}.");
+                    var currentPrice = await _BrapiQuoteService.GetStockPriceAsync(alert.Symbol);
+
+                    Console.WriteLine($"[{DateTime.Now:HH:mm:ss}] {alert.Symbol}: R$ {currentPrice:F2}");
+
+                    if (currentPrice >= alert.SellPrice)
+                    {
+                        await _mailKitService.SendEmailAsync(
+                            $"Alerta de Venda: {alert.Symbol}",
+                            $"O ativo {alert.Symbol} atingiu o preço de venda de {alert.SellPrice:F2}. \nPreço atual: {currentPrice:F2}.");
+                        Console.WriteLine("  → Email de VENDA enviado.");
+                    }
+                    else if (currentPrice <= alert.BuyPrice)
+                    {
+                        await _mailKitService.SendEmailAsync(
+                            $"Alerta de Compra: {alert.Symbol}",
+                            $"O ativo {alert.Symbol} atingiu o preço de compra de {alert.BuyPrice:F2}. Preço atual: {currentPrice:F2}.");
+                        Console.WriteLine("  → Email de COMPRA enviado.");
+                    }
                 }
-                else if (currentPrice <= alert.BuyPrice)
+                catch (Exception ex)
                 {
-                    await _mailKitService.SendEmailAsync(
-                        $"Alerta de Compra: {alert.Symbol}",
-                        $"O ativo {alert.Symbol} atingiu o preço de compra de {alert.BuyPrice:C}. Preço atual: {currentPrice:C}.");
+                    Console.WriteLine($"[{DateTime.Now:HH:mm:ss}] Erro: {ex.Message}. Tentando novamente em {interval.TotalSeconds}s.");
                 }
 
-                await Task.Delay(TimeSpan.FromMinutes(1), cancellationToken);
+                await Task.Delay(interval, cancellationToken);
             }
         }
     }
 }
+
